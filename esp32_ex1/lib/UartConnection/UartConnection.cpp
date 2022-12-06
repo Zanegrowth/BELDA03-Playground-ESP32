@@ -34,55 +34,7 @@ bool UartConnection::validCRC(const char *data, const int len)
 
 void UartConnection::parsePacket(const char *data)
 {
-
-    char mode = data[1];
-    switch (mode)
-    {
-    case MESSAGE_MODE:
-        {
-            char type = data[2];
-            switch (type)
-            {
-            case SSID_TYPE:
-            {
-                SSIDPacket ssidMsg;
-                Packet::parse(ssidMsg, data);
-                listener->onWifiConfig(ssidMsg);
-            }
-            break;
-            case DEVICE_ID_TYPE:
-            {
-                // String deviceIDMsg;
-                Packet::parse(device_id, data);
-                Serial.print("device id:: ");
-                Serial.println(device_id);
-   
-            }
-            break;
-            default:
-                break;
-            }
-        }
-        break;
-
-    case SENSOR_MODE:
-    {
-
-        SensorPacket sensorMsg;
-        sensorMsg.device_id = device_id;
-        Packet::parse(sensorMsg, data);
-        if (device_id.length() != 0)
-        {
-            listener->onData(sensorMsg);
-        }
-    }
-        break;
-    
-    default:
-        break;
-    }
-
-
+    /*Todo..*/
 }
 
 void UartConnection::run(void){
@@ -91,6 +43,7 @@ void UartConnection::run(void){
     char buf_all[MAX_BUFFER_SIZE];
     while (sp->available() > 0)
     {
+        /*
         len = sp->readBytesUntil('\n', buf_read, MAX_BUFFER_SIZE) + last_len;
 
         memcpy(&buf_all[inx], buf_read, len);
@@ -125,6 +78,7 @@ void UartConnection::run(void){
             inx = len;
             buf_all[inx++] = 0x0A;
         }
+        */
     }
 }
 

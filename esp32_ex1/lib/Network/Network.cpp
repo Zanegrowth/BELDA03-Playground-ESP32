@@ -35,8 +35,9 @@ void Network::connectWiFi(void)
 
 void Network::taskSyncTime(void *param)
 {
+    Serial.println("Time syncing...");
     Network *obj = static_cast<Network *>(param);
-    while (!obj->isTimeSync)
+    while (!obj->timeSyncStatus)
     {
         if (obj->isNetworkConnected())
         {
@@ -49,39 +50,36 @@ void Network::taskSyncTime(void *param)
 
 bool Network::isNetworkConnected()
 {
+    // Serial.print(WiFi.status());
     return WiFi.status() == WL_CONNECTED;
-    Serial.print(WiFi.status());
 }
 
-// bool Network::isInternetAvailable()
-// {
-//     return isInternet;
-// }
+bool Network::isInternetAvailable()
+{
+    return internetStatus;
+}
 
-// void Network::checkInternet()
-// {
-//     if (isNetworkConnected())
-//     {
-//         Serial.println("Check internet");
-//         isInternet = wifiClient.connect("google.com", 443);
-//         wifiClient.stop();
-//         if (listener != NULL)
-//         {
-//             listener->onNetworkEvent(isInternet ? INTERNET_CONNECTED : INTERNET_DISCONNECTED);
-//         }
-//     }
-//     else
-//     {
-//         isInternet = false;
-//     }
-// }
+void Network::checkInternet()
+{
+    if (isNetworkConnected())
+    {
+        Serial.println("Check internet");
+        internetStatus = wifiClient.connect("google.com", 443);
+        wifiClient.stop();
+        onNetworkEvent(internetStatus ? INTERNET_CONNECTED : INTERNET_DISCONNECTED);
+    }
+    else
+    {
+        internetStatus = false;
+    }
+}
 
 void Network::init(void)
 {
-    // initWiFi();
-    wifiClientHttp.setInsecure();
-
-    xTaskCreate(taskSyncTime, "taskSyncTime", 1024 * 2 , this, 10 , NULL);
+    initWiFi(); 
+    // wifiClientHttp.setInsecure();
+    wifiClient.setInsecure();
+   
 }
 
 void Network::setNetworkListener(NetworkListener &listener)
@@ -89,10 +87,12 @@ void Network::setNetworkListener(NetworkListener &listener)
     this->listener = &listener;
 }
 
-void Network::setHttpAuthHeader(String name, String value)
+void Network::onNetworkEvent(NetworkEvent event)
 {
-    httpHeaderAuthName = name;
-    httpHeaderAuthValue = value;
+    if (listener != NULL)
+    {
+        listener->onNetworkEvent(event);
+    }
 }
 
 void Network::syncTime()
@@ -104,42 +104,15 @@ void Network::syncTime()
         return;
     }
     Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-    isTimeSync = true;
-    if (listener != NULL)
-    {
-        listener->onNetworkEvent(TIME_SYNCED);
-    }
+    timeSyncStatus = true;
+    onNetworkEvent(TIME_SYNCED);
 }
 
-void Network::httpGet(String &url)
+bool Network::isTimeSync()
 {
-    if (http.begin(wifiClientHttp, url))
-    {
-        // http.addHeader(httpHeaderAuthName, httpHeaderAuthValue, true, true);
-        int statusCode = http.GET();
-        if (listener != NULL)
-        {
-            listener->onHttpResponse(url, statusCode, http.getString());
-        }
-        http.end();
-    }
+    return timeSyncStatus;
 }
 
-void Network::httpPost(String &url, String &payload)
-{
-    if (http.begin(wifiClientHttp, url))
-    {
-        http.addHeader(httpHeaderAuthName, httpHeaderAuthValue, true, true);
-        http.addHeader("Content-Type", "application/json", false, false);
-
-        int statusCode = http.POST(payload);
-        if (listener != NULL)
-        {
-            listener->onHttpResponse(url, statusCode, http.getString());
-        }
-        http.end();
-    }
-}
 
 void Network::onWiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info)
 {
@@ -155,10 +128,11 @@ void Network::onWiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info)
         if (wifiState != SYSTEM_EVENT_STA_GOT_IP)
         {
             wifiState = SYSTEM_EVENT_STA_GOT_IP;
-            if (listener != NULL){
-                listener->onNetworkEvent(WIFI_CONNECTED);
-            }
-            // Serial.print("WIFI_CONNECTED");
+            onNetworkEvent(WIFI_CONNECTED);
+            if (!isTimeSync())
+            {
+                xTaskCreate(taskSyncTime, "taskSyncTime", 1024 * 2, this, 10, NULL);
+            } 
         }
     }
     break;
@@ -167,10 +141,7 @@ void Network::onWiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info)
         if (wifiState != SYSTEM_EVENT_STA_DISCONNECTED)
         {
             wifiState = SYSTEM_EVENT_STA_DISCONNECTED;
-            if (listener != NULL){
-                listener->onNetworkEvent(WIFI_DISCONNECTED);
-            }
-            // Serial.print("WIFI_DISCONNECTED");
+            onNetworkEvent(WIFI_DISCONNECTED);
         }
         WiFi.reconnect();
     }
@@ -180,7 +151,5 @@ void Network::onWiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info)
         break;
     }
 }
-
-
 
 Network net;

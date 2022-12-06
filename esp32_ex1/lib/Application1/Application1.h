@@ -2,12 +2,24 @@
 #define Application1_H
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
-#include "UartConnection.h"
 #include "Network.h"
+#include "MQTTConnection.h"
 #include "Util.h"
+#include "Config.h"
+#include "Sensors.h"
+#include "Controllers.h"
+// #include <ArduinoJson.h>
 
-class Application1 : public UartConnectionListener, public NetworkListener
+class Application1 : public NetworkListener
 {
+
+
+private:
+  Controllers controllers;
+
+private:
+    // Network Listener
+    void onNetworkEvent(NetworkEvent event);
 
 public:
     Application1();
@@ -15,16 +27,9 @@ public:
     void init(void);
     void run();
 
-    // Uart Listener
-    void onData(SensorPacket &msg);
-    void onWifiConfig(SSIDPacket &msg);
-
-    // Network Listener
-    void onNetworkEvent(NetworkEvent event);
-    void onHttpResponse(const String &url, int statusCode, const String &responseText);
 
 };
 
-extern Application1 app;
+extern Application1 app1;
 
 #endif
