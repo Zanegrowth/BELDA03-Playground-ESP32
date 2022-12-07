@@ -76,7 +76,7 @@ void MQTTConnection::publishToCloud(const char *topic, const char *payload)
     }
 }
 
-const char *PAYLOAD_TEST = "{\"dts\":1650946232574,\"seq\":1,\"status\":1,\"airtemp\":25,\"airhumd\":100,\"lightIntensity\":1000,\"moisture\":100,\"voltageValue\":4.5,\"currentValue\":1,\"waterValue\":0,\"fertilizerValue\":0,\"IO1Status\":1,\"IO2Status\":1,\"IO3Status\":1,\"IO4Status\":1,\"dimLevel\":100,\"closeTime\":1650946232574,\"openTime\":1650946232574,\"errorCode\":1}";
+// const char *PAYLOAD_TEST = "{\"dts\":1650946232574,\"seq\":1,\"status\":1,\"airtemp\":25,\"airhumd\":100,\"lightIntensity\":1000,\"moisture\":100,\"voltageValue\":4.5,\"currentValue\":1,\"waterValue\":0,\"fertilizerValue\":0,\"IO1Status\":1,\"IO2Status\":1,\"IO3Status\":1,\"IO4Status\":1,\"dimLevel\":100,\"closeTime\":1650946232574,\"openTime\":1650946232574,\"errorCode\":1}";
 // const char *PAYLOAD_TEST = "{\"dts\":1650946232574,\"seq\":1,\"status\":1,\"airtemp\":25,\"airhumd\":100,\"lightIntensity\":1000,\"moisture\":100,\"voltageValue\":4.5,\"currentValue\":1,\"waterValue\":0,\"fertilizerValue\":0,\"IO1Status\":1}";
 
 
@@ -94,8 +94,8 @@ void MQTTConnection::run()
 
             if (client.connect(MQTT_CLIENTID, MQTT_USER, MQTT_PASS))
             {
-                // client.subscribe(MQTT_SERVER_TOPIC);
-                client.subscribe("smartfarm/#");
+                client.subscribe(MQTT_SERVER_TOPIC);
+                // client.subscribe("smartfarm/#");
                 net.onNetworkEvent(MQTT_HUB_CONNECTED);
             }
             else // Disconnected

@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include "Sensors.h"
 #include "Util.h"
+// #include <Math.h>
 
 #define INTERVAL_READ_DHT11     5000    // 5 s
 #define INTERVAL_READ_SOIL      9000    // 9 s
@@ -26,16 +27,20 @@ private:
     float currentValue;
     unsigned int waterValue;
     unsigned int fertilizerValue;
-    bool IO1Status;
-    bool IO2Status;
-    bool IO3Status;
-    bool IO4Status;
+    byte IO1Status;
+    byte IO2Status;
+    byte IO3Status;
+    byte IO4Status;
     unsigned int dimLevel;
-    unsigned long closeTime;
-    unsigned long openTime;
+    unsigned long long closeTime;
+    unsigned long long openTime;
+    unsigned int errorCode;
 
+    byte onlineStatus;
+    byte status;
     unsigned short seq;
     bool sendReady;
+    bool controlReday;
 
     unsigned long lastTimeReadDHT11;
     unsigned long lastTimeReadSoil;
@@ -45,14 +50,19 @@ private:
 
 private:
     void onSubMessage(char *payload);
-    void packData();
+    String packData();
     void parseData();
-    
+    static void taskLEDToggle(void *param);
+    void dimInit();
+    void setDimLevel(int level);
+
 public:
     Controllers();
     ~Controllers();
     void init();
     void run();
+    // void dimInit();
+    // void setDimLevel(int level);
     // void onMqttMessage(char *topic, byte *payload, unsigned int length);
 };
 

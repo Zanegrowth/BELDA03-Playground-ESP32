@@ -63,7 +63,7 @@ void Network::checkInternet()
 {
     if (isNetworkConnected())
     {
-        Serial.println("Check internet");
+        Serial.println("Check internet...");
         internetStatus = wifiClient.connect("google.com", 443);
         wifiClient.stop();
         onNetworkEvent(internetStatus ? INTERNET_CONNECTED : INTERNET_DISCONNECTED);

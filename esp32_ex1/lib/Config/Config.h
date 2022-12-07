@@ -2,7 +2,7 @@
 #define Config_H
 
 /*
-V2.2
+V2.2.1
 nipon@zanegrowth.com
 */
 
@@ -10,11 +10,23 @@ nipon@zanegrowth.com
 #define LED_GREEN_PIN        32
 #define LED_YELLOW_PIN       33
 #define LED_RED_PIN          25
+#define DIM_PIN              16
+#define IO1                  19
+#define IO2                  18
+#define IO3                  5
+#define IO4                  17
 #define SDA_PIN              21
 #define SCL_PIN              22
 #define DHT_PIN              4 // Digital pin connected to the DHT sensor
 #define SOIL_RESET_PIN       23
 #define CURRENT_PIN          34
+
+#define PWM_CHANNEL          0
+#define PWM_FREQ             10000
+#define PWM_RESULOTION       8
+
+#define SENSOR_NORMAL()      digitalWrite(LED_RED_PIN, LOW)
+#define SENSOR_ABNORMAL()    digitalWrite(LED_RED_PIN, HIGH)
 
 #define VOLTAGE_VALUE        3.3
 

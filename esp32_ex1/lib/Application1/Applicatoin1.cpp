@@ -19,7 +19,7 @@ void Application1::init(void)
     digitalWrite(LED_RED_PIN, LOW);
     digitalWrite(LED_YELLOW_PIN, LOW);
 
-
+ 
     //Serial setup
     Serial.begin(9600);
     delay(1000);
@@ -31,7 +31,7 @@ void Application1::init(void)
     net.init();
    
     /*MQTT setup*/
-    // mqtt.init();
+    mqtt.init();
 
 
     delay(10000);
@@ -49,14 +49,10 @@ void Application1::init(void)
 
 void Application1::run()
 {
-    // mqtt.run();
+    mqtt.run();
     controllers.run();
     // sensors.run();
-    // uc.run();
-    // Serial.println("Hello ESP32");
-    // digitalWrite(LED_IO1, HIGH);
-    // delay(1000);
-    // digitalWrite(LED_IO1, LOW);
+    
     // delay(2000);
     // vTaskDelay(ms(2000));
 }

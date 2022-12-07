@@ -39,7 +39,7 @@ void Sensors::init()
 {
     // mqtt.setMQTTConnectionListener(SENSORS_TYPE, *this);
 
-    Serial.println(F("Sensors setup"));
+    Serial.println(F("Sensors setup..."));
     Wire.begin(SDA_PIN, SCL_PIN);
 
     Serial.println(F("DHT11 Air Temp&Humd sensor begin"));
@@ -60,10 +60,12 @@ void Sensors::init()
     if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE))
     {
         Serial.println(F("BH1750 Light sensor begin"));
+        SENSOR_NORMAL();
     }
     else
     {
         Serial.println(F("Error initialising BH1750"));
+        SENSOR_ABNORMAL();
     }
     // lastTimeGetVol = millis();
     // Serial.println("Calibrating... Ensure that no current flows through the sensor at this moment");
@@ -81,26 +83,24 @@ void Sensors::readDHT11(float *airTemperature, float *airHumidity)
     if (isnan(event.temperature))
     {
         Serial.println(F("Error reading temperature!"));
+        SENSOR_ABNORMAL();
     }
     else
     {
-        // Serial.print(F("Temperature: "));
-        // Serial.print(event.temperature);
-        // Serial.println(F("°C"));
         *airTemperature = event.temperature;
+        SENSOR_NORMAL();
     }
     // Get humidity event and print its value.
     dht.humidity().getEvent(&event);
     if (isnan(event.relative_humidity))
     {
         Serial.println(F("Error reading humidity!"));
+        SENSOR_ABNORMAL();
     }
     else
     {
-        // Serial.print(F("Humidity: "));
-        // Serial.print(event.relative_humidity);
-        // Serial.println(F("%"));
         *airHumidity = event.relative_humidity;
+        SENSOR_NORMAL();
     }
 }
 
@@ -108,8 +108,6 @@ unsigned int Sensors::readSoilMoisture(void)
 {
    uint16_t soilMoisture = readI2CRegister16bit(0x20, 0);
    uint16_t percentSoilMoisture = map(soilMoisture, 304, 508, 0, 100);
-//    Serial.println(soilMoisture);
-//    Serial.println(percentSoilMoisture); // read capacitance register
    return percentSoilMoisture;
    // delay(9000);                                 // this can take a while
 }
@@ -120,9 +118,6 @@ float Sensors::readLight(void)
     if (lightMeter.measurementReady())
     {
         lux = lightMeter.readLightLevel();
-        // Serial.print("Light: ");
-        // Serial.print(lux);
-        // Serial.println(" lx");
     }
     return lux;
 }
