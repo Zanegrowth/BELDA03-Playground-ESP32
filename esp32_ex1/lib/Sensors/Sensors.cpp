@@ -42,11 +42,12 @@ void Sensors::init()
     Serial.println(F("Sensors setup..."));
     Wire.begin(SDA_PIN, SCL_PIN);
 
+#if USE_AIR_SENSOR == 1
     Serial.println(F("DHT11 Air Temp&Humd sensor begin"));
     dht.begin();
+#endif
 
-    // Wire.begin();
-
+#if USE_SOIL_MOIS_SENSOR == 1
     Serial.println(F("Soil Moisture begin"));
     pinMode(SOIL_RESET_PIN, OUTPUT);
     digitalWrite(SOIL_RESET_PIN, LOW);
@@ -56,6 +57,9 @@ void Sensors::init()
     pinMode(SOIL_RESET_PIN, INPUT);
     writeI2CRegister8bit(0x20, 6); // reset
 
+#endif
+
+#if USE_LIGHT_SENSOR == 1
     // begin returns a boolean that can be used to detect setup problems.
     if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE))
     {
@@ -67,17 +71,18 @@ void Sensors::init()
         Serial.println(F("Error initialising BH1750"));
         SENSOR_ABNORMAL();
     }
-    // lastTimeGetVol = millis();
-    // Serial.println("Calibrating... Ensure that no current flows through the sensor at this moment");
-    // int zero =
+#endif
+
+#if USE_CURRENT_SENSOR == 1
     Serial.println(F("ACS712 Current sensor begin"));
     current.calibrate();
-    // Serial.println("Done!");
-    // Serial.println("Zero point for this sensor = " + zero);
+#endif
+
 }
 
 void Sensors::readDHT11(float *airTemperature, float *airHumidity)
 {
+#if USE_AIR_SENSOR == 1
     sensors_event_t event;
     dht.temperature().getEvent(&event);
     if (isnan(event.temperature))
@@ -102,34 +107,47 @@ void Sensors::readDHT11(float *airTemperature, float *airHumidity)
         *airHumidity = event.relative_humidity;
         SENSOR_NORMAL();
     }
+#else
+    *airTemperature = 0.0;
+    *airHumidity = 0.0;
+#endif
 }
 
 unsigned int Sensors::readSoilMoisture(void)
 {
-   uint16_t soilMoisture = readI2CRegister16bit(0x20, 0);
-   uint16_t percentSoilMoisture = map(soilMoisture, 304, 508, 0, 100);
-   return percentSoilMoisture;
-   // delay(9000);                                 // this can take a while
+    uint16_t percentSoilMoisture = 0;
+#if USE_SOIL_MOIS_SENSOR == 1
+    uint16_t soilMoisture = readI2CRegister16bit(0x20, 0);
+    percentSoilMoisture = map(soilMoisture, 304, 508, 0, 100);
+    return percentSoilMoisture;
+    // delay(9000);                                 // this can take a while
+#endif
+    return percentSoilMoisture;
 }
 
 float Sensors::readLight(void)
 {
-    float lux;
+    float lux = 0.0;
+#if USE_LIGHT_SENSOR == 1
     if (lightMeter.measurementReady())
     {
         lux = lightMeter.readLightLevel();
     }
+#endif
     return lux;
 }
 
 float Sensors::readCurrent(void)
 {
-    return current.getCurrentDC();
+    float currentValue = 0.0;
+#if USE_CURRENT_SENSOR == 1
+    currentValue = current.getCurrentDC();
+#endif
+    return currentValue;
 }
 
 void Sensors::run()
 {
-
 
 }
 

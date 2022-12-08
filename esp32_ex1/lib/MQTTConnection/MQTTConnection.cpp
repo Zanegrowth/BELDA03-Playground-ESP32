@@ -69,10 +69,12 @@ void MQTTConnection::publishToCloud(const char *topic, const char *payload)
 {
     if (client.connected())
     {
+#if USE_PUBISH_MQTT == 1
         client.publish(topic, payload);
         Serial.print("Publish : ");
         Serial.println(topic);
         Serial.println(payload);
+#endif
     }
 }
 
@@ -94,7 +96,9 @@ void MQTTConnection::run()
 
             if (client.connect(MQTT_CLIENTID, MQTT_USER, MQTT_PASS))
             {
+#if USE_SUBSCIBE_MQTT == 1
                 client.subscribe(MQTT_SERVER_TOPIC);
+#endif
                 // client.subscribe("smartfarm/#");
                 net.onNetworkEvent(MQTT_HUB_CONNECTED);
             }
@@ -113,8 +117,6 @@ void MQTTConnection::run()
           
         }
     }
- 
-    // publishToCloud(MQTT_DEVICE_TOPIC, PAYLOAD_TEST);
 }
 
 MQTTConnection mqtt;

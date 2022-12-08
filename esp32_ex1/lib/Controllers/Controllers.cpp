@@ -42,7 +42,6 @@ void Controllers::onSubMessage(char *payload)
     if (doc.containsKey("onlineStatus"))
     {
         onlineStatus = doc["onlineStatus"];
-        digitalWrite(LED_GREEN_PIN, onlineStatus);
     }
     if (doc.containsKey("IO1Status"))
     {
@@ -92,6 +91,7 @@ void Controllers::onSubMessage(char *payload)
     Serial.println(openTime);
 
     sendReady = 1;
+    controlReday = 1;
     doc.clear();
 }
 
@@ -137,6 +137,17 @@ void Controllers::parseData()
 
 void Controllers::init() 
 {
+
+    pinMode(IO1, OUTPUT);
+    pinMode(IO2, OUTPUT);
+    pinMode(IO3, OUTPUT);
+    pinMode(IO4, OUTPUT);
+
+    digitalWrite(IO1, IO1Status);
+    digitalWrite(IO2, IO2Status);
+    digitalWrite(IO3, IO3Status);
+    digitalWrite(IO4, IO4Status);
+
     dimInit();
     mqtt.setMQTTConnectionListener(CONTROLLERS_TYPE, *this);
     sensors.init();
@@ -168,7 +179,7 @@ void Controllers::dimInit()
 
     // attach the channel to the GPIO to be controlled
     ledcAttachPin(DIM_PIN, PWM_CHANNEL);
-
+    setDimLevel(dimLevel);
 }
 
 void Controllers::setDimLevel(int level)
@@ -274,14 +285,29 @@ void Controllers::run()
         xTaskCreate(taskLEDToggle, "taskLEDToggle", 1024, this, 11, NULL);
 
 
+
         lastTimeSendPacket = millis();
         sendReady = 0;
     }
     if(controlReday){
-
-
-
-
+#if USE_DIM == 1
+        digitalWrite(LED_GREEN_PIN, onlineStatus);
+#endif
+#if USE_IO1 == 1
+        digitalWrite(IO1, IO1Status);
+#endif
+#if USE_IO2 == 1
+        digitalWrite(IO2, IO2Status);
+#endif
+#if USE_IO3 == 1
+        digitalWrite(IO3, IO3Status);
+#endif
+#if USE_IO4 == 1
+        digitalWrite(IO4, IO4Status);
+#endif
+        /*Todo...
+            Setting ON or OFF with openTime and closeTime
+        */
         setDimLevel(dimLevel);
         controlReday = 0;
     }

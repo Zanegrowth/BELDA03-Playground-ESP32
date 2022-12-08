@@ -2,7 +2,7 @@
 #define Config_H
 
 /*
-V2.2.1
+V2.2.2
 nipon@zanegrowth.com
 */
 
@@ -15,8 +15,8 @@ nipon@zanegrowth.com
 #define IO2                  18
 #define IO3                  5
 #define IO4                  17
-#define SDA_PIN              21
-#define SCL_PIN              22
+#define SDA_PIN              21 //I2C bus --> SDA
+#define SCL_PIN              22 //I2C bus --> SCL
 #define DHT_PIN              4 // Digital pin connected to the DHT sensor
 #define SOIL_RESET_PIN       23
 #define CURRENT_PIN          34
@@ -30,6 +30,19 @@ nipon@zanegrowth.com
 
 #define VOLTAGE_VALUE        3.3
 
+/*Sensors config*/
+#define USE_AIR_SENSOR        0  //Air Temperature and Humidity Sensor
+#define USE_SOIL_MOIS_SENSOR  0  //Soil Moisture Sensor 
+#define USE_LIGHT_SENSOR      0  //light Sensor
+#define USE_CURRENT_SENSOR    0  //Current Sensor
+
+/*Controllers config*/
+#define USE_DIM               0
+#define USE_IO1               0
+#define USE_IO2               0
+#define USE_IO3               0
+#define USE_IO4               0
+
 /*WiFi config*/
 #define WIFI_SSID           "Zanegrowth1"
 #define WIFI_PASS           "Zanegrowth15133"
@@ -42,6 +55,8 @@ nipon@zanegrowth.com
 #define DEVICE_TYPE_NUMBER  "390001"
 
 /*MQTT config*/
+#define USE_PUBISH_MQTT     1 
+#define USE_SUBSCIBE_MQTT   1
 #define MQTT_HOST           "mqtt.thailand-smartliving.com"
 #define MQTT_USER           "belda"
 #define MQTT_PASS           "belda03"
