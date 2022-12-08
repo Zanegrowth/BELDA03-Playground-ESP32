@@ -42,35 +42,50 @@ void Controllers::onSubMessage(char *payload)
     if (doc.containsKey("onlineStatus"))
     {
         onlineStatus = doc["onlineStatus"];
+        digitalWrite(LED_GREEN_PIN, onlineStatus);
     }
     if (doc.containsKey("IO1Status"))
     {
         IO1Status = doc["IO1Status"];
+        sendReady = 1;
+        controlReday = 1;
     }
     if (doc.containsKey("IO2Status"))
     {
         IO2Status = doc["IO2Status"];
+        sendReady = 1;
+        controlReday = 1;
     }
     if (doc.containsKey("IO3Status"))
     {
         IO3Status = doc["IO3Status"];
+        sendReady = 1;
+        controlReday = 1;
     }
     if (doc.containsKey("IO4Status"))
     {
         IO4Status = doc["IO4Status"];
+        sendReady = 1;
+        controlReday = 1;
     }
     if (doc.containsKey("dimLevel"))
     {
         dimLevel = doc["dimLevel"];
+        sendReady = 1;
+        controlReday = 1;
         // setDimLevel(dimLevel);
     }
     if (doc.containsKey("closeTime"))
     {
         closeTime = doc["closeTime"];
+        sendReady = 1;
+        controlReday = 1;
     }
     if (doc.containsKey("openTime"))
     {
         openTime = doc["openTime"];
+        sendReady = 1;
+        controlReday = 1;
     }
 
     Serial.print(F("onlineStatus: "));
@@ -90,8 +105,7 @@ void Controllers::onSubMessage(char *payload)
     Serial.print(F("openTime: "));
     Serial.println(openTime);
 
-    sendReady = 1;
-    controlReday = 1;
+
     doc.clear();
 }
 
@@ -290,9 +304,7 @@ void Controllers::run()
         sendReady = 0;
     }
     if(controlReday){
-#if USE_DIM == 1
-        digitalWrite(LED_GREEN_PIN, onlineStatus);
-#endif
+    
 #if USE_IO1 == 1
         digitalWrite(IO1, IO1Status);
 #endif
@@ -308,7 +320,9 @@ void Controllers::run()
         /*Todo...
             Setting ON or OFF with openTime and closeTime
         */
+#if USE_DIM == 1
         setDimLevel(dimLevel);
+#endif
         controlReday = 0;
     }
 
